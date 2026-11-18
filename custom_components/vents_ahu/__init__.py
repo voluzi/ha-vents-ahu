@@ -28,6 +28,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: VentsConfigEntry) -> boo
         entry.async_on_unload(
             entry.add_update_listener(partial(_async_options_updated, entry.options))
         )
+        entry.async_on_unload(client.async_close)
         ready = True
     finally:
         if not ready:
@@ -43,8 +44,4 @@ async def _async_options_updated(
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: VentsConfigEntry) -> bool:
-    if await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
-        await entry.runtime_data.async_shutdown()
-        await entry.runtime_data.client.async_close()
-        return True
-    return False
+    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)

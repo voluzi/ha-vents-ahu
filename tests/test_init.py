@@ -1,3 +1,5 @@
+import asyncio
+
 from aiovents import VentsConnectionError
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.helpers import entity_registry as er
@@ -56,3 +58,36 @@ async def test_initial_failure_retries_and_closes_transport(hass, entry, mock_ve
     assert entry.state is ConfigEntryState.SETUP_RETRY
     assert mock_vents.async_get_status.await_count == 3
     mock_vents.async_close.assert_awaited_once()
+
+
+async def test_unload_cancels_in_flight_poll_before_closing(
+    hass, setup_entry, mock_vents
+):
+    running = asyncio.Event()
+    transport_lock = asyncio.Lock()
+
+    async def poll():
+        async with transport_lock:
+            running.set()
+            await asyncio.Future()
+
+    async def close():
+        async with transport_lock:
+            pass
+
+    mock_vents.async_get_status.side_effect = poll
+    mock_vents.async_close.side_effect = close
+    refresh = setup_entry.async_create_background_task(
+        hass, setup_entry.runtime_data.async_refresh(), name="Test Vents poll"
+    )
+    try:
+        async with asyncio.timeout(1):
+            await running.wait()
+            assert await hass.config_entries.async_unload(setup_entry.entry_id)
+        assert refresh.cancelled()
+        assert setup_entry.state is ConfigEntryState.NOT_LOADED
+        mock_vents.async_close.assert_awaited_once()
+    finally:
+        if not refresh.done():
+            refresh.cancel()
+            await asyncio.gather(refresh, return_exceptions=True)

@@ -20,7 +20,7 @@ async def test_user_flow_normalizes_device_id(hass, mock_vents):
     with patch(
         "homeassistant.config_entries.ConfigEntries.async_setup", return_value=True
     ):
-        result = await user_step(hass, device_id="Fake-1", name="Example Vents")
+        result = await user_step(hass, device_id="  Fake-1  ", name="Example Vents")
         await hass.async_block_till_done()
     assert result["type"] is data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result["title"] == "Example Vents"
@@ -33,6 +33,7 @@ async def test_user_flow_normalizes_device_id(hass, mock_vents):
     ("field", "value", "error"),
     [
         ("device_id", "", "invalid_device_id"),
+        ("device_id", "   ", "invalid_device_id"),
         ("device_id", "x" * 17, "invalid_device_id"),
         ("device_id", "démo", "invalid_device_id"),
         ("password", "", "invalid_password"),

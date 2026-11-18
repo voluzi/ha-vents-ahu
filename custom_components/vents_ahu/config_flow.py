@@ -116,7 +116,7 @@ class VentsConfigFlow(ConfigFlow, domain=DOMAIN):
             device_id = None if entry is None else stored_id
             if entry is None:
                 try:
-                    device_id = normalize_device_id(user_input[CONF_DEVICE_ID])
+                    device_id = normalize_device_id(user_input[CONF_DEVICE_ID].strip())
                 except VentsValueError:
                     errors[CONF_DEVICE_ID] = "invalid_device_id"
             try:

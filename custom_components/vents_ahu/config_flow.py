@@ -1,9 +1,8 @@
 """Device setup, connection reconfiguration and polling options."""
 
 from collections.abc import Mapping
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-import voluptuous as vol
 from aiovents import AsyncVents, VentsConnectionError, VentsError, VentsValueError
 from aiovents.codec import encode_password, normalize_device_id
 from aiovents.const import DEFAULT_PASSWORD, DEFAULT_PORT, DEFAULT_TIMEOUT
@@ -20,6 +19,14 @@ from homeassistant.helpers.selector import (
     TextSelectorConfig,
     TextSelectorType,
 )
+
+if TYPE_CHECKING:
+    import probatio as vol
+else:
+    try:
+        import probatio as vol
+    except ModuleNotFoundError:
+        import voluptuous as vol
 
 from .const import (
     CONF_DEVICE_ID,

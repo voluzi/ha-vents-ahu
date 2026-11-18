@@ -16,16 +16,24 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        harness: ["0.13.236", "0.13.316"]
+        include:
+          - python: "3.13"
+            harness: pytest-homeassistant-custom-component==0.13.236
+          - python: "3.13"
+            harness: pytest-homeassistant-custom-component==0.13.316
+          - python: "3.14"
+            harness: requirements_test.txt
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.13"
+          python-version: ${{ matrix.python }}
           cache: pip
           cache-dependency-path: requirements_test.txt
-      - run: python -m pip install ruff mypy pytest-homeassistant-custom-component==${{ matrix.harness }}
-      # CI requires aiovents 0.1.0 on PyPI; it has not been published yet.
+      - if: matrix.harness == 'requirements_test.txt'
+        run: python -m pip install -r requirements_test.txt
+      - if: matrix.harness != 'requirements_test.txt'
+        run: python -m pip install ruff mypy "${{ matrix.harness }}"
       - run: python -m pip install aiovents==0.1.0
       - run: ruff check .
       - run: ruff format --check .

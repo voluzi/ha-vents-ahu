@@ -1,5 +1,6 @@
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+addopts = "-p no:respx"
 asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
 pythonpath = ["."]
@@ -17,5 +18,5 @@ follow_imports = "silent"
 files = ["custom_components"]
 
 [[tool.mypy.overrides]]
-module = ["voluptuous", "voluptuous.*"]
+module = ["probatio"]
 ignore_missing_imports = true

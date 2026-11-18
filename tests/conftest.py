@@ -1,8 +1,8 @@
+from importlib.util import find_spec
 from unittest.mock import AsyncMock, patch
 
 import pytest
 from aiovents import FanSpeed, Mode, VentsSettings, VentsStatus
-from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.vents_ahu.const import DOMAIN
 
@@ -14,7 +14,12 @@ CONFIG = {
     "password": "fake-password",
 }
 
-pytest_plugins = ["pytest_homeassistant_custom_component"]
+if find_spec("pytest_homeassistant"):
+    from pytest_homeassistant.common import MockConfigEntry
+else:
+    from pytest_homeassistant_custom_component.common import MockConfigEntry
+
+    pytest_plugins = ["pytest_homeassistant_custom_component"]
 
 
 @pytest.fixture(autouse=True)

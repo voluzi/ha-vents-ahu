@@ -1,6 +1,6 @@
 """Climate and power control."""
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from aiovents.registers import POWER_ON, SPEED, TARGET_TEMP
 from homeassistant.components.climate import ClimateEntity
@@ -26,7 +26,7 @@ async def async_setup_entry(
 class VentsClimate(VentsEntity, ClimateEntity):
     _attr_hvac_modes = [HVACMode.OFF, *MODE_BY_OPTION]
     _attr_fan_modes = list(SPEED_BY_OPTION)
-    _attr_temperature_unit = UnitOfTemperature.CELSIUS
+    _attr_native_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_min_temp = TARGET_TEMP["min"]
     _attr_max_temp = TARGET_TEMP["max"]
     _attr_target_temperature_step = 1
@@ -60,7 +60,7 @@ class VentsClimate(VentsEntity, ClimateEntity):
         return OPTION_BY_SPEED[speed] if speed is not None else None
 
     @property
-    def current_temperature(self) -> float | None:
+    def native_current_temperature(self) -> float | None:
         return self.coordinator.data.status.exhaust_in_temperature
 
     @property
@@ -68,8 +68,13 @@ class VentsClimate(VentsEntity, ClimateEntity):
         return self.coordinator.data.status.current_humidity
 
     @property
-    def target_temperature(self) -> float | None:
+    def native_target_temperature(self) -> float | None:
         return self.coordinator.data.status.target_temp
+
+    if not TYPE_CHECKING and not hasattr(ClimateEntity, "native_temperature_unit"):
+        _attr_temperature_unit = _attr_native_temperature_unit
+        current_temperature = native_current_temperature
+        target_temperature = native_target_temperature
 
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         if hvac_mode == HVACMode.OFF:

@@ -5,7 +5,7 @@ from typing import Any
 from aiovents.registers import POWER_ON, SPEED, TARGET_TEMP
 from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import ClimateEntityFeature, HVACMode
-from homeassistant.const import ATTR_TEMPERATURE, PRECISION_WHOLE, UnitOfTemperature
+from homeassistant.const import ATTR_TEMPERATURE, PRECISION_TENTHS, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -30,7 +30,7 @@ class VentsClimate(VentsEntity, ClimateEntity):
     _attr_min_temp = TARGET_TEMP["min"]
     _attr_max_temp = TARGET_TEMP["max"]
     _attr_target_temperature_step = 1
-    _attr_precision = PRECISION_WHOLE
+    _attr_precision = PRECISION_TENTHS
     _attr_supported_features = (
         ClimateEntityFeature.TARGET_TEMPERATURE
         | ClimateEntityFeature.FAN_MODE

@@ -36,9 +36,10 @@ async def test_climate_state_and_availability(
     state = hass.states.get(ENTITY["entity_id"])
     assert state.state == expected
     if expected != "unavailable":
-        assert state.attributes["current_temperature"] == 22
+        assert state.attributes["current_temperature"] == 21.5
         assert state.attributes["current_humidity"] == 45
         assert state.attributes["temperature"] == 22
+        assert state.attributes["target_temp_step"] == 1
         assert state.attributes["fan_mode"] == "medium"
 
 

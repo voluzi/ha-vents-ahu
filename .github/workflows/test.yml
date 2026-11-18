@@ -25,6 +25,7 @@ jobs:
           cache: pip
           cache-dependency-path: requirements_test.txt
       - run: python -m pip install ruff mypy pytest-homeassistant-custom-component==${{ matrix.harness }}
+      # CI requires aiovents 0.1.0 on PyPI; it has not been published yet.
       - run: python -m pip install aiovents==0.1.0
       - run: ruff check .
       - run: ruff format --check .

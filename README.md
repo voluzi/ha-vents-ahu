@@ -58,6 +58,9 @@ entities against the inventory.
 
 ## Local development
 
+The integration test workflow installs `aiovents==0.1.0` from PyPI. That version has not
+been published yet, so run the tests with the local library checkout for now.
+
 With the sibling `aiovents` checkout available, use Python 3.13:
 
 ```sh

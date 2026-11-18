@@ -1,0 +1,61 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Vents AHU",
+        "description": "Enter the connection details for the air handling unit. An incorrect password or device ID can cause the unit to appear unreachable.",
+        "data": {
+          "host": "Host",
+          "port": "UDP port",
+          "device_id": "Device ID",
+          "password": "Password",
+          "name": "Name"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure Vents AHU",
+        "description": "Update the connection details for this unit. Leave the password field blank to keep the current password.",
+        "data": {
+          "host": "Host",
+          "port": "UDP port",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to the unit. Check its address, port, device ID, and password.",
+      "invalid_device_id": "Enter a device ID with 1 to 16 ASCII characters.",
+      "invalid_host": "Enter a host.",
+      "invalid_password": "Enter a password with 1 to 255 ASCII characters.",
+      "invalid_port": "Enter a UDP port from 1 to 65535.",
+      "unknown": "An unexpected error occurred."
+    },
+    "abort": {
+      "already_configured": "This device is already configured.",
+      "reconfigure_successful": "The connection settings were updated.",
+      "unique_id_mismatch": "The device ID does not match the configured device."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Polling intervals",
+        "data": {
+          "scan_interval": "Status polling interval (seconds)",
+          "settings_interval": "Fan settings polling interval (seconds)"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "command_failed": {
+      "message": "The Vents AHU command failed."
+    },
+    "whole_temperature_required": {
+      "message": "Enter a whole temperature in degrees Celsius."
+    },
+    "whole_number_required": {
+      "message": "Enter a whole number."
+    }
+  }
+}

@@ -1,6 +1,7 @@
 {
   "domain": "vents_ahu",
   "name": "Vents AHU",
+  "categories": ["climate.fans_ventilation"],
   "codeowners": ["@helder-moreira"],
   "config_flow": true,
   "documentation": "https://github.com/voluzi/ha-vents-ahu",

@@ -31,7 +31,8 @@ GitHub release.
 
 ## Brand images
 
-Replace the placeholders under `custom_components/vents_ahu/brand/`. Supply a
+To update the brand images, replace the PNG files under
+`custom_components/vents_ahu/brand/`. Supply a
 256 × 256 pixel `icon.png` and a `logo.png` that preserves the brand's aspect
 ratio, preferably landscape, with its shorter side between 128 and 256 pixels.
 Optional high resolution files are `icon@2x.png` (512 × 512) and `logo@2x.png`

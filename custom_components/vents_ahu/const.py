@@ -21,7 +21,14 @@ MAX_SETTINGS_INTERVAL = 3600
 STATUS_READ_ATTEMPTS = 3
 RETRY_DELAY = 0.08
 
-PLATFORMS: list[Platform] = []
+PLATFORMS = [
+    Platform.BINARY_SENSOR,
+    Platform.BUTTON,
+    Platform.CLIMATE,
+    Platform.NUMBER,
+    Platform.SELECT,
+    Platform.SENSOR,
+]
 
 MODE_BY_OPTION = {
     HVACMode.AUTO: Mode.AUTO,

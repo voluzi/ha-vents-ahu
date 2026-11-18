@@ -2,8 +2,10 @@ from dataclasses import replace
 from datetime import timedelta
 from unittest.mock import AsyncMock, patch
 
+import pytest
 from aiovents import VentsConnectionError
 from aiovents.registers import SUPPLY_FAN_SPEED_1, TARGET_TEMP
+from homeassistant.exceptions import HomeAssistantError
 
 
 async def test_status_failure_retries_in_cycle_and_recovers(
@@ -61,16 +63,37 @@ async def test_confirmed_values_are_published_before_refresh(
     coordinator = setup_entry.runtime_data
     mock_vents.async_write_register.side_effect = [21, 38]
 
+    observed = []
+
     async def observe_refresh():
-        if coordinator.data.status.target_temp == 21:
-            assert float(hass.states.get("number.vents_ahu_target_temp").state) == 21
+        observed.append(
+            (
+                float(hass.states.get("number.vents_ahu_target_temp").state),
+                float(hass.states.get("number.vents_ahu_supply_fan_speed_1").state),
+            )
+        )
 
     with patch.object(
         coordinator, "async_request_refresh", AsyncMock(side_effect=observe_refresh)
-    ) as refresh:
-        await coordinator.async_write(TARGET_TEMP, 23)
-        assert coordinator.data.status.target_temp == 21
-        await coordinator.async_write(SUPPLY_FAN_SPEED_1, 40)
-        assert coordinator.data.settings.supply_fan_speed_1 == 38
-        assert coordinator.data.settings.exhaust_fan_speed_1 == 30
-        assert refresh.await_count == 2
+    ):
+        await coordinator.async_write(TARGET_TEMP, 21)
+        await coordinator.async_write(SUPPLY_FAN_SPEED_1, 38)
+    assert observed == [(21, 25), (21, 38)]
+    assert coordinator.data.settings.exhaust_fan_speed_1 == 30
+
+
+async def test_unconfirmed_write_fails_without_updating_state(
+    hass, setup_entry, mock_vents
+):
+    mock_vents.async_write_register.return_value = 23
+
+    with pytest.raises(HomeAssistantError) as error:
+        await hass.services.async_call(
+            "number",
+            "set_value",
+            {"entity_id": "number.vents_ahu_target_temp", "value": 24},
+            blocking=True,
+        )
+
+    assert error.value.translation_key == "command_failed"
+    assert float(hass.states.get("number.vents_ahu_target_temp").state) == 22

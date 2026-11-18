@@ -101,6 +101,11 @@ class VentsCoordinator(DataUpdateCoordinator[VentsData]):
                 translation_domain=DOMAIN, translation_key="command_failed"
             ) from exc
 
+        if confirmed != value:
+            raise HomeAssistantError(
+                translation_domain=DOMAIN, translation_key="command_failed"
+            )
+
         data = self.data
         values = {register_name(reg): confirmed}
         if reg in SETTINGS_REGISTERS:

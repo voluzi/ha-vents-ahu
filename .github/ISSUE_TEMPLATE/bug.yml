@@ -1,0 +1,29 @@
+name: Bug report
+description: Report a reproducible problem with Vents AHU.
+body:
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Include the Vents AHU version and the Home Assistant version.
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device model and firmware
+      description: Share the model and firmware version if relevant. Omit serial numbers and device IDs.
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include what happened and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics and logs
+      description: >-
+        Attach the diagnostics download if available, or include relevant Home Assistant logs and sensor readings.
+        Remove private IP addresses, hostnames, identifiers, credentials and location details before posting.

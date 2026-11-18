@@ -1,0 +1,17 @@
+name: Feature request
+description: Suggest an improvement to Vents AHU.
+body:
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: What are you trying to do, and where do you get stuck?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the result you would like and any alternatives you considered.
+    validations:
+      required: true

@@ -3,6 +3,7 @@ from aiovents import VentsConnectionError, VentsValueError
 from aiovents.registers import EXHAUST_FAN_SPEED_2, TARGET_TEMP
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import entity_registry as er
+from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
 
 
 @pytest.mark.parametrize(
@@ -87,12 +88,41 @@ async def test_device_errors_are_reported_to_service_caller(
     assert type(error.value) is service_error
 
 
-async def test_fractional_value_does_not_send_write(hass, setup_entry, mock_vents):
-    with pytest.raises(ServiceValidationError):
+@pytest.mark.parametrize(
+    ("key", "translation_key"),
+    [
+        ("target_temp", "whole_temperature_required"),
+        ("exhaust_fan_speed_2", "whole_number_required"),
+    ],
+)
+async def test_fractional_value_does_not_send_write(
+    hass, setup_entry, mock_vents, key, translation_key
+):
+    with pytest.raises(ServiceValidationError) as error:
         await hass.services.async_call(
             "number",
             "set_value",
-            {"entity_id": "number.vents_ahu_exhaust_fan_speed_2", "value": 24.5},
+            {"entity_id": f"number.vents_ahu_{key}", "value": 24.5},
             blocking=True,
         )
+    assert error.value.translation_key == translation_key
     mock_vents.async_write_register.assert_not_awaited()
+
+
+@pytest.mark.parametrize(("fahrenheit", "celsius"), [(74, 23), (75, 24)])
+async def test_number_rounds_converted_setpoint(
+    hass, entry, mock_vents, fahrenheit, celsius
+):
+    hass.config.units = US_CUSTOMARY_SYSTEM
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    mock_vents.async_write_register.return_value = celsius
+
+    await hass.services.async_call(
+        "number",
+        "set_value",
+        {"entity_id": "number.vents_ahu_target_temp", "value": fahrenheit},
+        blocking=True,
+    )
+
+    mock_vents.async_write_register.assert_awaited_once_with(TARGET_TEMP, celsius)

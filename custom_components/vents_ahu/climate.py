@@ -12,7 +12,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import MODE_BY_OPTION, OPTION_BY_MODE, OPTION_BY_SPEED, SPEED_BY_OPTION
 from .coordinator import VentsConfigEntry
-from .entity import VentsEntity, whole_value
+from .entity import VentsEntity, temperature_setpoint
 
 
 async def async_setup_entry(
@@ -92,8 +92,7 @@ class VentsClimate(VentsEntity, ClimateEntity):
 
     async def async_set_temperature(self, **kwargs: Any) -> None:
         if ATTR_TEMPERATURE in kwargs:
-            value = whole_value(
-                float(kwargs[ATTR_TEMPERATURE]),
-                translation_key="whole_temperature_required",
+            value = temperature_setpoint(
+                float(kwargs[ATTR_TEMPERATURE]), self.hass.config.units.temperature_unit
             )
             await self.async_write(TARGET_TEMP, value)

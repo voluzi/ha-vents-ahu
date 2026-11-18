@@ -1,6 +1,7 @@
 """Shared device identity and register commands."""
 
 from aiovents import Register, RegisterValue
+from homeassistant.const import UnitOfTemperature
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -15,6 +16,12 @@ def whole_value(value: float, *, translation_key: str) -> int:
             translation_domain=DOMAIN, translation_key=translation_key
         )
     return int(value)
+
+
+def temperature_setpoint(value: float, source_unit: str | None) -> int:
+    if source_unit is not None and source_unit != UnitOfTemperature.CELSIUS:
+        return round(value)
+    return whole_value(value, translation_key="whole_temperature_required")
 
 
 class VentsEntity(CoordinatorEntity[VentsCoordinator]):

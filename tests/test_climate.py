@@ -5,6 +5,7 @@ import pytest
 from aiovents import Mode
 from aiovents.registers import MODE, POWER_ON, SPEED, TARGET_TEMP
 from homeassistant.exceptions import ServiceValidationError
+from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
 
 ENTITY = {"entity_id": "climate.vents_ahu"}
 
@@ -79,3 +80,13 @@ async def test_fan_and_whole_temperature_commands(hass, setup_entry, mock_vents)
         call(SPEED, 3),
         call(TARGET_TEMP, 24),
     ]
+
+
+@pytest.mark.parametrize(("fahrenheit", "celsius"), [(74, 23), (75, 24)])
+async def test_climate_rounds_converted_setpoint(
+    hass, setup_entry, mock_vents, fahrenheit, celsius
+):
+    hass.config.units = US_CUSTOMARY_SYSTEM
+    mock_vents.async_write_register.return_value = celsius
+    await command(hass, "set_temperature", temperature=fahrenheit)
+    mock_vents.async_write_register.assert_awaited_once_with(TARGET_TEMP, celsius)

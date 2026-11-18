@@ -16,7 +16,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .coordinator import VentsConfigEntry
-from .entity import VentsEntity, whole_value
+from .entity import VentsEntity, temperature_setpoint, whole_value
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -83,11 +83,10 @@ class VentsNumber(VentsEntity, NumberEntity):
 
     async def async_set_native_value(self, value: float) -> None:
         register = self.entity_description.register
-        translation_key = (
-            "whole_temperature_required"
-            if register == TARGET_TEMP
-            else "whole_number_required"
-        )
-        await self.async_write(
-            register, whole_value(float(value), translation_key=translation_key)
-        )
+        if register == TARGET_TEMP:
+            setpoint = temperature_setpoint(float(value), self.unit_of_measurement)
+        else:
+            setpoint = whole_value(
+                float(value), translation_key="whole_number_required"
+            )
+        await self.async_write(register, setpoint)

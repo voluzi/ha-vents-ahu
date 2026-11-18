@@ -16,6 +16,12 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
+      - name: Check release version
+        run: |
+          if ! jq -e --arg version "${GITHUB_REF_NAME#v}" '.version == $version' custom_components/vents_ahu/manifest.json > /dev/null; then
+            printf 'Release tag %s does not match the manifest version.\n' "$GITHUB_REF_NAME" >&2
+            exit 1
+          fi
       - name: Package the integration
         run: git archive --format=zip --output="$RUNNER_TEMP/vents_ahu.zip" HEAD:custom_components/vents_ahu
       - name: Publish GitHub release
